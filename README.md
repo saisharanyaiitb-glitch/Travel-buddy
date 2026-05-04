@@ -40,7 +40,7 @@ https://saisharanyaiitb-glitch.github.io/Travel-buddy/
 ---
 
 ## 🛠️ Tech Stack
-- HTML, CSS, JavaScript  
+- HTML, JavaScript  
 - Google Gemini API  
 
 ---
