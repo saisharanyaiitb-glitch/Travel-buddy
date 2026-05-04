@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<title>Travel Buddy for Indian Tourists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --saffron:#FF6B00;--saffron-h:#e05a00;--saffron-l:#FFF0E5;--saffron-m:#FF9540;
+  --green:#138808;--green-l:#E8F5E9;
+  --navy:#000080;--navy-l:#E8EAFF;
+  --td:#1A1A2E;--tm:#4A4A6A;
+  --border:rgba(0,0,0,0.08);--card:#fff;--page:#F5F3EE;
+  --r:16px;--rs:10px;--sh:0 2px 12px rgba(0,0,0,0.07);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--page);color:var(--td);min-height:100vh;}
+
+/* ── API BAR ── */
+#apiBar{
+  background:#1A1A2E;padding:.9rem 1.4rem;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  position:sticky;top:0;z-index:100;
+  border-bottom:2.5px solid var(--saffron);
+}
+#apiBar label{color:rgba(255,255,255,.75);font-size:.82rem;white-space:nowrap;font-weight:500;}
+#keyIn{
+  flex:1;min-width:180px;max-width:360px;
+  padding:.5rem .9rem;border-radius:8px;
+  border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.09);color:#fff;
+  font-size:.85rem;outline:none;font-family:monospace;
+  transition:border-color .2s;
+}
+#keyIn::placeholder{color:rgba(255,255,255,.32);}
+#keyIn:focus{border-color:var(--saffron);}
+#saveBtn{
+  background:var(--saffron);color:#fff;border:none;border-radius:8px;
+  padding:.5rem 1.1rem;font-family:'Sora',sans-serif;font-weight:600;
+  font-size:.82rem;cursor:pointer;white-space:nowrap;transition:background .2s;
+}
+#saveBtn:hover{background:var(--saffron-h);}
+#keySt{font-size:.78rem;color:#66bb6a;display:none;}
+.getkey{
+  color:rgba(255,255,255,.5);font-size:.76rem;
+  text-decoration:underline;cursor:pointer;margin-left:auto;white-space:nowrap;
+}
+
+/* ── MODAL ── */
+#modal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:999;
+  align-items:center;justify-content:center;padding:1rem;
+}
+#modal.open{display:flex;}
+.mbox{
+  background:#fff;border-radius:var(--r);padding:1.8rem;
+  max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);
+}
+.mbox h2{font-family:'Sora',sans-serif;font-size:1.1rem;margin-bottom:1rem;}
+.free-pill{
+  background:#E8F5E9;color:#138808;border-radius:6px;
+  padding:3px 12px;font-size:.76rem;font-weight:600;
+  display:inline-block;margin-bottom:.9rem;
+}
+.mstep{display:flex;gap:10px;margin-bottom:.85rem;align-items:flex-start;}
+.msn{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--saffron);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;font-weight:700;flex-shrink:0;
+}
+.mst{font-size:.86rem;color:var(--tm);line-height:1.55;}
+.mst a{color:var(--saffron);font-weight:600;}
+.mst strong{color:var(--td);}
+.mclose{
+  width:100%;background:var(--saffron);color:#fff;border:none;
+  border-radius:10px;padding:.72rem;margin-top:1rem;
+  font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;
+}
+
+/* ── HEADER ── */
+.hdr{
+  background:linear-gradient(135deg,#FF6B00 0%,#FF9540 55%,#138808 100%);
+  padding:2.5rem 1.5rem 4rem;position:relative;overflow:hidden;
+}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;}
+.hdr::after{content:'✈';position:absolute;right:1.5rem;top:1.5rem;font-size:90px;opacity:.1;transform:rotate(-20deg);pointer-events:none;}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.logo-ic{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.logo-tx{font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;line-height:1.2;}
+.logo-sub{font-size:.7rem;font-weight:400;opacity:.85;}
+.hdr h1{font-family:'Sora',sans-serif;font-size:clamp(1.55rem,5vw,2.4rem);font-weight:700;color:#fff;line-height:1.2;margin-bottom:.5rem;}
+.hdr p{color:rgba(255,255,255,.88);font-size:.93rem;margin-bottom:1.6rem;max-width:480px;}
+.sw{position:relative;max-width:560px;}
+.si{width:100%;padding:1rem 1.2rem 1rem 3rem;border-radius:14px;border:none;font-family:'DM Sans',sans-serif;font-size:1rem;background:#fff;color:var(--td);box-shadow:0 4px 24px rgba(0,0,0,.18);outline:none;}
+.si-ic{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1.1rem;opacity:.4;pointer-events:none;}
+.goBtn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:var(--saffron);color:#fff;border:none;border-radius:10px;padding:.62rem 1.3rem;font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;transition:background .2s;}
+.goBtn:hover{background:var(--saffron-h);}
+.chips{display:flex;gap:8px;margin-top:.85rem;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:5px 14px;font-size:.8rem;cursor:pointer;transition:background .2s;}
+.chip:hover{background:rgba(255,255,255,.32);}
+
+/* ── MAIN ── */
+.main{padding:1.6rem 1.2rem;max-width:920px;margin:0 auto;}
+
+/* ── LOADING ── */
+#ldg{text-align:center;padding:4rem 1rem;display:none;}
+.spinner{width:52px;height:52px;border:4px solid var(--saffron-l);border-top-color:var(--saffron);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 1.2rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#ldgTx{color:var(--tm);font-size:.93rem;}
+
+/* ── ERROR ── */
+#errBox{background:#FFF5F5;border:1px solid #FFC8C8;border-radius:var(--rs);padding:1rem 1.2rem;color:#C62828;font-size:.87rem;display:none;margin-bottom:1rem;line-height:1.7;}
+
+/* ── EMPTY ── */
+#empty{text-align:center;padding:3rem 1rem;}
+.e-ic{font-size:4rem;margin-bottom:1rem;}
+.e-tt{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:600;margin-bottom:.4rem;}
+.e-sb{color:var(--tm);font-size:.88rem;line-height:1.7;}
+
+/* ── RESULTS ── */
+#res{display:none;}
+.city-hero{background:var(--card);border-radius:var(--r);padding:1.5rem;margin-bottom:1.2rem;box-shadow:var(--sh);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.c-em{font-size:3rem;line-height:1;}
+.c-info{flex:1;min-width:180px;}
+.c-name{font-family:'Sora',sans-serif;font-size:1.85rem;font-weight:700;line-height:1.1;}
+.c-tag{color:var(--tm);font-size:.88rem;margin-top:4px;}
+.fr-badge{color:#fff;border-radius:14px;padding:.9rem 1.2rem;text-align:center;min-width:128px;}
+.fr-num{font-family:'Sora',sans-serif;font-size:2.1rem;font-weight:700;line-height:1;}
+.fr-lbl{font-size:.68rem;opacity:.92;margin-top:2px;}
+.fr-st{font-size:.88rem;letter-spacing:1px;margin-top:3px;}
+.sg{display:grid;grid-template-columns:1fr;gap:1rem;}
+@media(min-width:640px){.sg{grid-template-columns:1fr 1fr;}}
+.sc{background:var(--card);border-radius:var(--r);padding:1.3rem;box-shadow:var(--sh);}
+.sc.full{grid-column:1/-1;}
+.sh2{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:2px solid var(--saffron-l);}
+.sic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.io{background:var(--saffron-l);} .ig{background:var(--green-l);} .ib{background:var(--navy-l);}
+.st{font-family:'Sora',sans-serif;font-weight:600;font-size:1rem;}
+.row{display:flex;justify-content:space-between;align-items:flex-start;padding:.44rem 0;border-bottom:1px solid var(--border);gap:8px;}
+.row:last-child{border-bottom:none;}
+.rl{font-size:.82rem;color:var(--tm);flex-shrink:0;}
+.rv{font-size:.86rem;font-weight:500;text-align:right;}
+.pc{background:var(--page);border-radius:var(--rs);padding:.72rem .95rem;margin-bottom:.5rem;}
+.pn{font-weight:500;font-size:.89rem;}
+.pm{font-size:.77rem;color:var(--tm);margin-top:3px;}
+.bdg{display:inline-block;padding:1px 8px;border-radius:20px;font-size:.7rem;font-weight:500;margin-left:5px;vertical-align:middle;}
+.bv{background:var(--green-l);color:var(--green);}
+.bj{background:#FFF8E1;color:#E65100;}
+.bn{background:var(--navy-l);color:var(--navy);}
+.li{padding:.42rem 0;border-bottom:1px solid var(--border);font-size:.85rem;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.li:last-child{border-bottom:none;}
+.ld{color:var(--saffron);flex-shrink:0;margin-top:1px;}
+.sr{margin-bottom:10px;}
+.sr-t{display:flex;justify-content:space-between;font-size:.81rem;margin-bottom:3px;}
+.sr-bg{height:7px;background:#EEEEF0;border-radius:4px;overflow:hidden;}
+.sr-fi{height:100%;border-radius:4px;transition:width 1s ease;}
+.hl{background:linear-gradient(135deg,#FF6B00,#FF9540);border-radius:var(--r);padding:1.5rem;color:#fff;}
+.hl .sh2{border-bottom-color:rgba(255,255,255,.25);}
+.hl .st{color:#fff;}
+.cli{display:flex;gap:12px;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.2);align-items:flex-start;}
+.cli:last-child{border-bottom:none;}
+.clN{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;margin-top:1px;}
+.cla{font-size:.9rem;font-weight:500;color:#fff;}
+.cld{font-size:.79rem;color:rgba(255,255,255,.82);margin-top:3px;}
+.ins{background:linear-gradient(90deg,#FF6B0010,#13880808);border:1px solid rgba(255,107,0,.14);border-radius:var(--rs);padding:.85rem 1rem;margin-bottom:.6rem;display:flex;gap:10px;align-items:flex-start;}
+.ind{width:8px;height:8px;border-radius:50%;background:var(--saffron);margin-top:6px;flex-shrink:0;}
+.int{font-size:.87rem;line-height:1.55;}
+.cur-big{text-align:center;padding:.9rem 0 .6rem;}
+.cur-a{font-family:'Sora',sans-serif;font-size:2rem;font-weight:700;color:var(--saffron);}
+.cur-l{font-size:.77rem;color:var(--tm);margin-top:2px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.8rem;}
+.tag{background:var(--saffron-l);color:#B85000;padding:4px 12px;border-radius:20px;font-size:.78rem;}
+.tip{border-radius:8px;padding:8px 11px;margin-top:10px;font-size:.8rem;line-height:1.55;}
+.to{background:var(--saffron-l);color:#B85000;}
+.tg{background:var(--green-l);color:#0A5E03;}
+.tb{background:var(--navy-l);color:#000080;}
+.ty{background:#FFF3E0;color:#E65100;}
+.em-g{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;}
+.em-p{background:var(--page);border-radius:8px;padding:8px 12px;font-size:.81rem;}
+.em-l{color:var(--tm);font-size:.72rem;}
+.em-v{font-weight:600;margin-top:1px;}
+</style>
+</head>
+<body>
+
+<!-- ── API BAR ── -->
+<div id="apiBar">
+  <label for="keyIn">🔑 Gemini API Key (Free):</label>
+  <input type="password" id="keyIn" placeholder="Paste your AIza… key here" autocomplete="off" spellcheck="false">
+  <button id="saveBtn" onclick="saveKey()">Save Key</button>
+  <span id="keySt">✅ Key saved!</span>
+  <span class="getkey" onclick="openModal()">How to get free key? →</span>
+</div>
+
+<!-- ── HOW-TO MODAL ── -->
+<div id="modal">
+  <div class="mbox">
+    <div class="free-pill">✅ 100% Free — No Credit Card Needed</div>
+    <h2>🔑 Get Your Free Gemini API Key</h2>
+    <div class="mstep"><div class="msn">1</div><div class="mst">Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a></div></div>
+    <div class="mstep"><div class="msn">2</div><div class="mst">Sign in with your <strong>Google / Gmail account</strong></div></div>
+    <div class="mstep"><div class="msn">3</div><div class="mst">Click <strong>"Create API Key"</strong> → choose any project → copy the key</div></div>
+    <div class="mstep"><div class="msn">4</div><div class="mst">The key starts with <strong>AIza…</strong> — paste it in the bar above and click <strong>Save Key</strong></div></div>
+    <div style="background:#E8F5E9;border-radius:8px;padding:10px 12px;font-size:.82rem;color:#0A5E03;margin-top:.5rem;">
+      🎉 Free tier: <strong>1,500 requests/day</strong> — more than enough for travel planning!
+    </div>
+    <button class="mclose" onclick="closeModal()">Got it — Close ✕</button>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-ic">🇮🇳</div>
+    <div class="logo-tx">Travel Buddy <div class="logo-sub">Made for Indian Tourists Abroad</div></div>
+  </div>
+  <h1>Your Smart Travel<br>Companion Abroad</h1>
+  <p>Everything Indian travelers need — food, money, transport, safety & more, for any city.</p>
+  <div class="sw">
+    <span class="si-ic">🔍</span>
+    <input class="si" id="cityIn" type="text" placeholder="Search any city: Paris, Bangkok, Dubai…" autocomplete="off" spellcheck="false" translate="no">
+    <button class="goBtn" onclick="go()">Explore →</button>
+  </div>
+  <div class="chips">
+    <span class="chip" onclick="qs('Dubai')">🕌 Dubai</span>
+    <span class="chip" onclick="qs('Bangkok')">🏯 Bangkok</span>
+    <span class="chip" onclick="qs('Paris')">🗼 Paris</span>
+    <span class="chip" onclick="qs('Singapore')">🦁 Singapore</span>
+    <span class="chip" onclick="qs('Tokyo')">⛩️ Tokyo</span>
+    <span class="chip" onclick="qs('London')">🎡 London</span>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <div id="errBox"></div>
+  <div id="ldg"><div class="spinner"></div><p id="ldgTx">Fetching insights…</p></div>
+  <div id="res"></div>
+  <div id="empty">
+    <div class="e-ic">✈️</div>
+    <div class="e-tt">Where are you flying to?</div>
+    <div class="e-sb">
+      1. Click <strong>"How to get free key?"</strong> above — takes 30 seconds<br>
+      2. Paste your <strong>AIza…</strong> Gemini key and click Save<br>
+      3. Search any city and get full Indian traveler info!
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ── MODAL ── */
+function openModal(){$('modal').classList.add('open');}
+function closeModal(){$('modal').classList.remove('open');}
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal();});
+
+/* ── KEY MANAGEMENT ── */
+function saveKey(){
+  const k=$('keyIn').value.trim();
+  if(!k){alert('Please paste your Gemini API key first (starts with AIza…)');return;}
+  localStorage.setItem('tb_gkey',k);
+  $('keySt').style.display='inline';
+  setTimeout(()=>$('keySt').style.display='none',3000);
+}
+function getKey(){return localStorage.getItem('tb_gkey')||$('keyIn').value.trim();}
+
+/* restore saved key */
+window.addEventListener('DOMContentLoaded',()=>{
+  const s=localStorage.getItem('tb_gkey');
+  if(s){$('keyIn').value=s;$('keySt').style.display='inline';setTimeout(()=>$('keySt').style.display='none',2000);}
+});
+
+/* ── SEARCH ── */
+function qs(c){$('cityIn').value=c;go();}
+$('cityIn').addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+
+const msgs=[
+  'Finding Indian restaurants nearby…',
+  'Checking currency rates…',
+  'Scouting vegetarian-friendly spots…',
+  'Calculating Indian Friendliness Score…',
+  'Mapping transport options…',
+  'Almost done — hang tight!'
+];
+
+async function go(){
+  const city=$('cityIn').value.trim();
+  if(!city)return;
+
+  const key=getKey();
+  if(!key){
+    $('errBox').style.display='block';
+    $('errBox').innerHTML='⚠️ No API key found. Click <strong style="cursor:pointer;text-decoration:underline" onclick="openModal()">"How to get free key?"</strong> in the top bar — it takes 30 seconds and is completely free!';
+    return;
+  }
+
+  $('empty').style.display='none';
+  $('res').style.display='none';
+  $('errBox').style.display='none';
+  $('ldg').style.display='block';
+
+  let mi=0;
+  const iv=setInterval(()=>{$('ldgTx').textContent=msgs[mi++%msgs.length];},1400);
+
+  try{
+    const data=await callGemini(city,key);
+    clearInterval(iv);
+    $('ldg').style.display='none';
+    render(data);
+    $('res').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    clearInterval(iv);
+    $('ldg').style.display='none';
+    $('errBox').style.display='block';
+    $('errBox').innerHTML=`⚠️ <strong>Error:</strong> ${e.message}`;
+    $('empty').style.display='block';
+  }
+}
+
+/* ── GEMINI API ── */
+async function callGemini(city,key){
+  const prompt=`You are a travel expert for Indian tourists going abroad. Give travel info for: ${city}.
+
+OUTPUT RULES — READ CAREFULLY:
+- Output ONLY valid JSON. Nothing else.
+- Do NOT use markdown or code fences.
+- Do NOT add any text before or after the JSON.
+- Keep all string values SHORT (under 20 words each) to avoid truncation.
+- Your entire response must be one complete, valid JSON object.
+
+Return this exact structure with real data for ${city}:
+
+{"city":"${city}","country":"fill","emoji":"fill","tagline":"fill","overview":{"intro":"fill","budgetPerDay":"fill","bestTime":"fill","language":"fill","timeZone":"fill"},"currency":{"code":"fill","name":"fill","rateToINR":0,"ex100":"fill","cardAccept":"fill","cashTip":"fill"},"food":{"availability":"fill","restaurants":[{"name":"fill","type":"fill","rating":4.0,"price":"fill","veg":true,"jain":false,"area":"fill"},{"name":"fill","type":"fill","rating":4.0,"price":"fill","veg":true,"jain":true,"area":"fill"},{"name":"fill","type":"fill","rating":4.0,"price":"fill","veg":false,"jain":false,"area":"fill"}],"grocery":["fill","fill"],"vegTip":"fill"},"money":{"exchange":["fill","fill","fill"],"atmTip":"fill","cardTip":"fill","upi":false,"strategy":"fill"},"transport":{"metroExists":true,"metroName":"fill","metroInfo":"fill","cardSteps":["fill","fill","fill"],"perRide":"fill","dayPass":"fill","airport":["fill","fill","fill"],"apps":"fill"},"stay":{"areas":[{"name":"fill","reason":"fill","vibe":"fill"},{"name":"fill","reason":"fill","vibe":"fill"}],"budget":["fill","fill"],"premium":["fill","fill"],"tip":"fill"},"connectivity":{"sim":["fill","fill"],"esim":true,"esimProviders":["fill","fill"],"dataCost":"fill","wifi":"fill","wifiTip":"fill"},"shopping":{"items":["fill","fill","fill","fill","fill"],"markets":["fill","fill","fill"],"bargain":"fill","duty":"fill"},"safety":{"level":"fill","scams":["fill","fill","fill"],"culture":["fill","fill","fill"],"law":"fill","sos":{"police":"fill","ambulance":"fill","embassy":"fill"}},"landed":[{"n":1,"action":"Get SIM card","detail":"fill"},{"n":2,"action":"Get cash","detail":"fill"},{"n":3,"action":"Go to city","detail":"fill"},{"n":4,"action":"Check in hotel","detail":"fill"},{"n":5,"action":"Find first meal","detail":"fill"}],"insights":["fill","fill","fill","fill","fill"],"score":{"overall":75,"food":75,"cost":75,"transport":75,"language":75,"comment":"fill"}}
+
+Replace every "fill" with real accurate information for ${city}. Replace 0 with real number. Return only the JSON.`;
+
+  const url=`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`;
+
+  /* retry up to 3 times with backoff for rate limits */
+  let res, attempt=0;
+  while(attempt<3){
+    res=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.4,maxOutputTokens:8192}
+    })
+    });
+    if(res.status!==429) break;
+    attempt++;
+    if(attempt<3){
+      $('ldgTx').textContent=`Rate limit hit — retrying in ${attempt*8} seconds…`;
+      await new Promise(r=>setTimeout(r,attempt*8000));
+    }
+  }
+
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    const msg=err.error?.message||`HTTP error ${res.status}`;
+    if(res.status===401||res.status===403)
+      throw new Error('Invalid API key. Make sure you copied the full AIza… key from aistudio.google.com');
+    if(res.status===400)
+      throw new Error('Request error: '+msg);
+    if(res.status===429)
+      throw new Error('Too many requests — wait 30 seconds and try again.');
+    throw new Error(msg);
+  }
+
+  const j=await res.json();
+  let raw=j.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  if(!raw) throw new Error('Empty response from Gemini. Please try again.');
+
+  /* strip markdown fences */
+  raw=raw.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```\s*$/,'').trim();
+
+  /* extract the JSON object */
+  const m=raw.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error('Could not parse response. Please try again.');
+  let jsonStr=m[0];
+
+  /* auto-repair: if JSON is truncated, close all open brackets */
+  try{
+    return JSON.parse(jsonStr);
+  }catch(e){
+    // count and close unclosed brackets/braces
+    let open_b=0, open_sq=0, inStr=false, escape=false;
+    for(let i=0;i<jsonStr.length;i++){
+      const c=jsonStr[i];
+      if(escape){escape=false;continue;}
+      if(c==='\\' && inStr){escape=true;continue;}
+      if(c==='"'){inStr=!inStr;continue;}
+      if(inStr) continue;
+      if(c==='{') open_b++;
+      else if(c==='}') open_b--;
+      else if(c==='[') open_sq++;
+      else if(c===']') open_sq--;
+    }
+    // remove trailing comma if any
+    jsonStr=jsonStr.replace(/,\s*$/,'');
+    // close open arrays then objects
+    for(let i=0;i<open_sq;i++) jsonStr+=']';
+    for(let i=0;i<open_b;i++) jsonStr+='}';
+    try{
+      return JSON.parse(jsonStr);
+    }catch(e2){
+      throw new Error('Response parsing failed. Please try again — this sometimes happens with complex cities.');
+    }
+  }
+}
+
+/* ── HELPERS ── */
+const $c=v=>v>=75?'#138808':v>=55?'#FF9540':'#E53935';
+const stars=n=>{const s=Math.round(n/20);return '★'.repeat(s)+'☆'.repeat(5-s);};
+const bar=v=>`<div class="sr-bg"><div class="sr-fi" style="width:${v}%;background:${$c(v)}"></div></div>`;
+const row=(l,v)=>`<div class="row"><span class="rl">${l}</span><span class="rv">${v}</span></div>`;
+const li=(b,t)=>`<div class="li"><span class="ld">${b}</span><span>${t}</span></div>`;
+
+/* ── RENDER ── */
+function render(d){
+  const s=d.score,col=$c(s.overall);
+  $('res').innerHTML=`
+
+  <div class="city-hero">
+    <div class="c-em">${d.emoji}</div>
+    <div class="c-info">
+      <div class="c-name">${d.city}, ${d.country}</div>
+      <div class="c-tag">${d.tagline}</div>
+    </div>
+    <div class="fr-badge" style="background:linear-gradient(135deg,${col},${col}BB)">
+      <div class="fr-num">${s.overall}</div>
+      <div class="fr-lbl">Indian Friendliness Score</div>
+      <div class="fr-st">${stars(s.overall)}</div>
+    </div>
+  </div>
+
+  <div class="sc full" style="margin-bottom:1rem">
+    <div class="sh2"><div class="sic io">📊</div><div class="st">Indian Friendliness Breakdown</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+      ${[['🍛 Food',s.food],['💰 Cost',s.cost],['🚇 Transport',s.transport],['🗣️ Language',s.language]].map(([l,v])=>`
+        <div class="sr">
+          <div class="sr-t"><span style="color:var(--tm)">${l}</span><span style="font-weight:600;color:${$c(v)}">${v}/100</span></div>
+          ${bar(v)}
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:10px;font-size:.8rem;color:var(--tm);font-style:italic">${s.comment}</div>
+  </div>
+
+  <div class="sg">
+
+    <div class="sc">
+      <div class="sh2"><div class="sic ib">🌍</div><div class="st">City Overview</div></div>
+      <p style="font-size:.85rem;color:var(--tm);line-height:1.65;margin-bottom:1rem">${d.overview.intro}</p>
+      ${row('Daily Budget',d.overview.budgetPerDay)}
+      ${row('Best Time to Visit',d.overview.bestTime)}
+      ${row('Language',d.overview.language)}
+      ${row('Time vs IST',d.overview.timeZone)}
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic io">💱</div><div class="st">Currency &amp; Conversion</div></div>
+      <div class="cur-big">
+        <div class="cur-a">1 ${d.currency.code} = ₹${d.currency.rateToINR}</div>
+        <div class="cur-l">${d.currency.name} → Indian Rupee (approx)</div>
+      </div>
+      ${row('100 '+d.currency.code+' in INR',d.currency.ex100)}
+      ${row('Card Acceptance',d.currency.cardAccept)}
+      <div class="tip to">💡 ${d.currency.cashTip}</div>
+    </div>
+
+    <div class="sc full">
+      <div class="sh2"><div class="sic io">🍛</div><div class="st">Indian Food &amp; Essentials</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+        <span style="font-size:.82rem;color:var(--tm)">Availability:</span>
+        <span class="bdg bv" style="font-size:.81rem;padding:3px 12px">${d.food.availability}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-bottom:1rem">
+        ${d.food.restaurants.map(r=>`
+          <div class="pc">
+            <div class="pn">${r.name}${r.veg?'<span class="bdg bv">🌿 Veg</span>':''}${r.jain?'<span class="bdg bj">Jain</span>':''}</div>
+            <div class="pm">⭐ ${r.rating} · ${r.type} · ${r.price} · ${r.area}</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:.84rem;font-weight:500;margin-bottom:6px">🛒 Indian Grocery Stores:</div>
+      ${d.food.grocery.map(s=>li('🛒',s)).join('')}
+      <div class="tip tg">🥗 ${d.food.vegTip}</div>
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic ig">💳</div><div class="st">Money &amp; Payments</div></div>
+      <div style="font-size:.84rem;font-weight:500;margin-bottom:6px">Exchange Locations:</div>
+      ${d.money.exchange.map(l=>li('📍',l)).join('')}
+      ${row('UPI Accepted',d.money.upi?'✅ Yes':'❌ Not yet')}
+      ${row('Best Strategy',d.money.strategy)}
+      <div class="tip tb">🏧 ${d.money.atmTip}</div>
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic ib">🚇</div><div class="st">Transport Guide</div></div>
+      ${d.transport.metroExists?`
+        <div style="font-weight:500;font-size:.9rem;margin-bottom:4px">${d.transport.metroName}</div>
+        <div style="font-size:.82rem;color:var(--tm);line-height:1.55;margin-bottom:.8rem">${d.transport.metroInfo}</div>
+        ${row('Per Ride',d.transport.perRide)}
+        ${row('Day Pass',d.transport.dayPass)}
+      `:'<p style="font-size:.84rem;color:var(--tm);margin-bottom:.8rem">No metro system — see airport options.</p>'}
+      <div style="font-size:.84rem;font-weight:500;margin:.8rem 0 6px">✈ Airport → City:</div>
+      ${d.transport.airport.map(o=>li('→',o)).join('')}
+      <div class="tip tb">📱 ${d.transport.apps}</div>
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic io">🏨</div><div class="st">Stay Options</div></div>
+      ${d.stay.areas.map(a=>`<div class="pc"><div class="pn">${a.name}<span class="bdg bn">${a.vibe}</span></div><div class="pm">${a.reason}</div></div>`).join('')}
+      <div style="font-size:.84rem;font-weight:500;margin:.8rem 0 5px">💰 Budget Hotels:</div>
+      ${d.stay.budget.map(h=>li('🏩',h)).join('')}
+      <div style="font-size:.84rem;font-weight:500;margin:.8rem 0 5px">⭐ Premium Hotels:</div>
+      ${d.stay.premium.map(h=>li('🏨',h)).join('')}
+      <div class="tip to">💡 ${d.stay.tip}</div>
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic ib">📱</div><div class="st">Connectivity</div></div>
+      <div style="font-size:.84rem;font-weight:500;margin-bottom:5px">SIM Card Options:</div>
+      ${d.connectivity.sim.map(s=>li('📡',s)).join('')}
+      ${d.connectivity.esim?`<div style="font-size:.84rem;font-weight:500;margin:.8rem 0 5px">eSIM Providers:</div>${d.connectivity.esimProviders.map(p=>li('🌐',p)).join('')}`:''}
+      ${row('WiFi Quality',d.connectivity.wifi)}
+      ${row('Data Plan Cost',d.connectivity.dataCost)}
+      <div class="tip tb">📶 ${d.connectivity.wifiTip}</div>
+    </div>
+
+    <div class="sc">
+      <div class="sh2"><div class="sic io">🛍️</div><div class="st">Shopping &amp; What to Buy</div></div>
+      <div style="font-size:.84rem;font-weight:500;margin-bottom:8px">Must-Buy Items:</div>
+      <div class="tags">${d.shopping.items.map(i=>`<span class="tag">${i}</span>`).join('')}</div>
+      <div style="font-size:.84rem;font-weight:500;margin-bottom:6px">Best Markets:</div>
+      ${d.shopping.markets.map(m=>li('🏪',m)).join('')}
+      ${row('Bargaining',d.shopping.bargain)}
+      <div class="tip ty">🛃 ${d.shopping.duty}</div>
+    </div>
+
+    <div class="sc full">
+      <div class="sh2"><div class="sic ig">🛡️</div><div class="st">Safety &amp; Cultural Tips</div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem">
+        <div>
+          <div style="font-size:.84rem;font-weight:500;margin-bottom:6px">⚠️ Common Scams:</div>
+          ${d.safety.scams.map(s=>li('⚠',s)).join('')}
+        </div>
+        <div>
+          <div style="font-size:.84rem;font-weight:500;margin-bottom:6px">🙏 Cultural Etiquette:</div>
+          ${d.safety.culture.map(t=>li('•',t)).join('')}
+        </div>
+      </div>
+      <div class="tip ty" style="margin-top:1rem">⚖️ <strong>Local Law:</strong> ${d.safety.law}</div>
+      <div class="em-g">
+        ${Object.entries(d.safety.sos).map(([k,v])=>`
+          <div class="em-p">
+            <div class="em-l">${k.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase())}</div>
+            <div class="em-v">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="hl full">
+      <div class="sh2">
+        <div class="sic" style="background:rgba(255,255,255,.22)">🛬</div>
+        <div class="st">Just Landed Checklist — First 2 Hours</div>
+      </div>
+      ${d.landed.map(i=>`
+        <div class="cli">
+          <div class="clN">${i.n}</div>
+          <div><div class="cla">✅ ${i.action}</div><div class="cld">${i.detail}</div></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="sc full">
+      <div class="sh2"><div class="sic io">🧠</div><div class="st">Smart Insights for Indian Travelers</div></div>
+      ${d.insights.map(t=>`<div class="ins"><div class="ind"></div><div class="int">${t}</div></div>`).join('')}
+    </div>
+
+  </div>`;
+
+  $('res').style.display='block';
+}
+</script>
+</body>
+</html>
